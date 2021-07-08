@@ -10,8 +10,11 @@
         />
       </v-col>
       <v-col cols="5" class="mb-4">
-        <v-btn x-large>
-        <v-icon large left>mdi-database-import-outline</v-icon>
+        <v-btn 
+          x-large
+          @click="mostrarListado">
+        <v-icon large left
+          >mdi-database-import-outline</v-icon>
           Ver Listado Completo de Documentos
         </v-btn>
       </v-col>
@@ -56,48 +59,23 @@
 </template>
 
 <script>
-import axios from 'axios'
 import { mapMutations } from 'vuex'
 export default {
-  name: 'HelloWorld',
+  name: 'Home',
 
   data: () => ({
     consulta: ''
   }),
   methods: {
     ...mapMutations(['actualizarConsulta']),
-    algo () {
+    mostrarListado () {
+      this.$router.push('listado')
+    },
+    buscarPorTexto () {
+      const payload = {add: false, pagina: 1, termino: this.consulta }
+      this.actualizarConsulta(payload)
       this.$router.push('resultados')
     },
-    async buscarPorTexto () {
-      await axios.get('http://localhost:5000/api/search',
-        {
-          params: { text: this.consulta, page: 1 }
-        }
-      )
-        .then(response => {
-          console.log(response.data)
-          const payload = { resultados: response.data, add: 0, pagina: 1, termino: this.consulta }
-          this.actualizarConsulta(payload)
-          this.$router.push('resultados')
-        })
-        .catch(e => {
-          console.log(e)
-        })
-    },
-    async verTodos () {
-      await axios.post('http://localhost:5000/api/get',
-        {
-          page: 1
-        }
-      )
-        .then(response => {
-          console.log(response.data)
-        })
-        .catch(e => {
-          console.log(e)
-        })
-    }
   }
 }
 </script>

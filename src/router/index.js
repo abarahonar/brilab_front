@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
 import Retrieve from '../views/Retrieve.vue'
+import FilterAll from '../views/FilterAll.vue'
 
 Vue.use(VueRouter)
 
@@ -15,7 +16,12 @@ const routes = [
     path: '/resultados',
     name: 'Retrieve',
     component: Retrieve
-  }
+  },
+  {
+    path: '/listado',
+    name: 'FilterAll',
+    component: FilterAll
+  },
 ]
 
 const router = new VueRouter({

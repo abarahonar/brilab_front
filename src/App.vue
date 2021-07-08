@@ -4,6 +4,7 @@
       app
       color="primary"
       dark
+      clipped-left
     >
       <v-row justify="center" class="hand" @click="algo">
         <v-img

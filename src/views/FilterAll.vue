@@ -1,17 +1,17 @@
 <template>
 <v-container fluid>
-  <Resultados/>
+  <ListadoTotal/>
   </v-container>
 </template>
 
 <script>
-import Resultados from '../components/Resultados'
+import ListadoTotal from '../components/ListadoTotal'
 
 export default {
-  name: 'Retrieve',
+  name: 'FilterAll',
 
   components: {
-    Resultados
+    ListadoTotal
   }
 }
 </script>

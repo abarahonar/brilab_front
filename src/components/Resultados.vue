@@ -1,12 +1,11 @@
 <template>
 <v-container fluid>
 
-<v-row justify="center" no-gutters>
-<v-col cols="2">
     <v-navigation-drawer
       v-model="drawer"
       width="300"
-      absolute
+      clipped
+      app
       stateless
     >
       <v-list-item>
@@ -28,15 +27,18 @@
         </v-list-item-content>
       </v-list-item>
       <v-divider></v-divider>
+      <template v-slot:append>
       <div class="pa-2">
           <v-btn
             block
+            x-large
             color="primary"
             :disabled="filtrar.region.length == 0 && filtrar.sector.length == 0 && (range[0] == 1900 && range[1] == 2021)"
             @click="mostrar">
             Aplicar Filtros
           </v-btn>
         </div>
+      </template>
 
       <v-list
         nav
@@ -144,17 +146,13 @@
       </v-list-group>
       </v-list>
     </v-navigation-drawer>
-</v-col>
-<v-col></v-col>
 
-<v-col
-  cols="10"
->
-<v-row justify="center" no-gutters>
+<v-row justify="center">
   <v-col
     cols="8"
   >
     <v-text-field
+      v-model="terminoConsulta"
       label="Nueva búsqueda"
       solo
       rounded
@@ -170,16 +168,17 @@
             v-bind="attrs"
             v-on="on"
             large
-            @click="algo"
+            @click="buscarPorTexto"
           >mdi-magnify</v-icon>
         </template>
         <span>Buscar</span>
       </v-tooltip>
     </template>
     </v-text-field>
+    <div class="text-overline"> <span class="test">Se han encontrado los siguientes resultados para <strong>"{{consulta.termino}}"</strong></span> </div>
   </v-col>
-<v-col cols="11">
-<v-row no-gutters>
+<v-row justify="center" no-gutters>
+
   <v-card
     width="600"
     height="275"
@@ -224,31 +223,29 @@
       </v-tooltip>
       </v-list-item-avatar>
     </v-list-item>
-      <!--v-card-actions class="card-actions">
-      <v-btn
-        outlined
-        rounded
-        text
-      >
-        Descargar PDF
-      </v-btn>
-    </v-card-actions-->
   </v-card>
   </v-row>
-  </v-col>
 </v-row>
-
-</v-col>
+  <v-row justify="center">
+   <v-btn
+      v-if="consulta.verMas"
+      fab
+      x-large
+      @click="updatePagina"
+    >
+        <v-icon x-large color="primary">mdi-plus</v-icon>
+    </v-btn>
   </v-row>
   </v-container>
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapMutations } from 'vuex'
 import axios from 'axios'
 export default {
   data () {
     return {
+      terminoConsulta:'',
       resultados: [],
       filtros: [],
       filtrar: { sector: '', region: '', from_year: 0, till_year: 0 },
@@ -256,23 +253,6 @@ export default {
       max: 2021,
       range: [1900, 2021],
       drawer: true,
-      resumen: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean at vulputate magna. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum commodo lorem eu erat aliquam, sit amet suscipit enim aliquam. Ut eget neque varius dui tempus semper. Nunc consequat posuere velit et ultrices. Aenean ac urna ut ipsum tempor convallis. Pellentesque ac sem leo. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; In hac habitasse platea dictumst. Etiam vitae leo tristique, maximus nisi vel, placerat sapien. Vestibulum semper quam mauris, non pharetra dolor ultrices vel. Vestibulum enim dolor, lacinia. ',
-      lista: [
-        { nombre: 'Conflicto 1', anio: 'Año 1', resumen: 'Su resumen piola 1', link: ' ' },
-        { nombre: 'Conflicto 2', anio: 'Año 2', resumen: 'Su resumen piola 2', link: ' ' },
-        { nombre: 'Conflicto 3', anio: 'Año 3', resumen: 'Su resumen piola 3', link: ' ' },
-        { nombre: 'Conflicto 4', anio: 'Año 4', resumen: 'Su resumen piola 4', link: ' ' },
-        { nombre: 'Conflicto 5', anio: 'Año 5', resumen: 'Su resumen piola 5', link: ' ' },
-        { nombre: 'Conflicto 6', anio: 'Año 6', resumen: 'Su resumen piola 6', link: ' ' },
-        { nombre: 'Conflicto 7', anio: 'Año 7', resumen: 'Su resumen piola 7', link: ' ' },
-        { nombre: 'Conflicto 8', anio: 'Año 8', resumen: 'Su resumen piola 8', link: ' ' },
-        { nombre: 'Conflicto 9', anio: 'Año 9', resumen: 'Su resumen piola 9', link: ' ' },
-        { nombre: 'Conflicto 10', anio: 'Año 10', resumen: 'Su resumen piola 10', link: ' ' },
-        { nombre: 'Conflicto 11', anio: 'Año 11', resumen: 'Su resumen piola 11', link: ' ' },
-        { nombre: 'Conflicto 12', anio: 'Año 12', resumen: 'Su resumen piola 12', link: ' ' },
-        { nombre: 'Conflicto 13', anio: 'Año 13', resumen: 'Su resumen piola 13', link: ' ' },
-        { nombre: 'Conflicto 14', anio: 'Año 14', resumen: 'Su resumen piola 14', link: ' ' }
-      ],
       items: [
         { title: 'Región', icon: 'mdi-sign-real-estate' },
         { title: 'Sector', icon: 'mdi-map-marker' },
@@ -282,8 +262,10 @@ export default {
     }
   },
   methods: {
-    algo () {
-      console.log('algo')
+    ...mapMutations(['actualizarConsulta']),
+    buscarPorTexto () {
+      const payload = {add: false, pagina: 1, termino: this.terminoConsulta }
+      this.actualizarConsulta(payload)
     },
     openFilter () {
       this.drawer = !this.drawer
@@ -292,12 +274,16 @@ export default {
       await axios.get('http://localhost:5000/api/filters'
       )
         .then(response => {
-          console.log(response.data)
           this.filtros = response.data
         })
         .catch(e => {
           console.log(e)
         })
+    },
+    updatePagina () {
+      let payload = {}
+      payload.add = true
+      this.actualizarConsulta(payload)
     },
     mostrar () {
       this.filtrar.from_year = this.range[0]
@@ -333,6 +319,9 @@ export default {
 .card-actions {
   position: absolute;
   bottom: 0;
+}
+.test{
+  font-size: 18px;
 }
 
 </style>
