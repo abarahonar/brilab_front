@@ -10,7 +10,7 @@ export default new Vuex.Store({
       pagina: [],
       termino: [],
       verMas : false,
-      sinResultados : false,
+      sinResultados : true,
     }
   },
   mutations: {
@@ -38,6 +38,7 @@ export default new Vuex.Store({
               state.consulta.resultados = []
               state.consulta.sinResultados = true
               state.consulta.verMas = false
+              state.consulta.termino = payload.termino
             }
             else{
               state.consulta.sinResultados = false

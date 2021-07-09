@@ -31,6 +31,7 @@
             height="60"
             clearable
             placeholder="Ingrese su búsqueda"
+            @keydown.enter="buscarPorTexto"
           >
             <template v-slot:append>
               <v-tooltip bottom>
@@ -72,10 +73,11 @@ export default {
       this.$router.push('listado')
     },
     buscarPorTexto () {
-      const payload = {add: false, pagina: 1, termino: this.consulta }
-      this.actualizarConsulta(payload)
-      this.$router.push('resultados')
-    },
+      this.$router.push({
+        name: 'Retrieve',
+        query:{text: this.consulta}
+      })
+    }
   }
 }
 </script>

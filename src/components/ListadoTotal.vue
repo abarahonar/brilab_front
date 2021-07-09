@@ -29,21 +29,20 @@
         </v-list-item>
         <v-divider></v-divider>
         <div class="pa-2">
-            <v-btn
-              block
-              color="warning"
-              :disabled="filtrar.region.length == 0 && filtrar.sector.length == 0 && (range[0] == 1900 && range[1] == 2021)"
-              @click="restablecerFiltros">
-              Restablecer Filtros
-            </v-btn>
-          </div>
+          <v-btn
+            block
+            color="warning"
+            :disabled="filtrar.region.length == 0 && filtrar.sector.length == 0 && (range[0] == 1900 && range[1] == 2021)"
+            @click="restablecerFiltros">
+            Restablecer Filtros
+          </v-btn>
+        </div>
         <template v-slot:append>
         <div class="pa-2">
             <v-btn
               block
               x-large
               color="primary"
-              
               @click="getAll">
               Aplicar Filtros
             </v-btn>
@@ -164,16 +163,15 @@
                 Error
               </div>
               </v-list-item-subtitle>
-              <v-list-item-title class="text-h4 mb-1">
-              <div class="text-overline">
+              <div class="text-overline mb-1">
                 No se han encontrado resultados para los filtros ingresados
               </div>
                 
-              </v-list-item-title>
               <v-list-item-subtitle>
                 <span class="warningmsg">Prueba
                 <v-btn
                   color="warning"
+                  elevation="0"
                   small
                   :disabled="filtrar.region.length == 0 && filtrar.sector.length == 0 && (range[0] == 1900 && range[1] == 2021)"
                   @click="restablecerFiltros">
@@ -371,7 +369,7 @@ export default {
 
 </script>
 
-<style>
+<style scoped>
 .hand{
     cursor: pointer;
   }
