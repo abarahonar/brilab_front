@@ -43,7 +43,7 @@
               block
               x-large
               color="primary"
-              @click="getAll">
+              @click="getAll(false)">
               Aplicar Filtros
             </v-btn>
           </div>
@@ -242,7 +242,7 @@
             v-if="verMas"
             fab
             x-large
-            @click="updatePage"
+            @click="getAll(true)"
           >
             <v-icon x-large color="primary">mdi-plus</v-icon>
         </v-btn>
@@ -291,23 +291,28 @@ export default {
           console.log(e)
         })
     },
-    async getAll () {
-      this.queryObject = {
+    async getAll (updatePage) {
+
+      if(updatePage){
+        this.queryObject.page = this.queryObject.page + 1
+      }
+      else{
+        this.queryObject = {
             page: 1,
             from: this.range[0],
             until: this.range[1],
-          }
-      if (this.filtrar.region.length > 0)
+        }
+        if (this.filtrar.region.length > 0)
         this.queryObject.region = this.filtrar.region
 
-      if (this.filtrar.sector.length > 0)
-        this.queryObject.sector = this.filtrar.sector
+        if (this.filtrar.sector.length > 0)
+          this.queryObject.sector = this.filtrar.sector
+      }
       
       await axios.post('http://localhost:5000/api/get',
        this.queryObject
       )
         .then(response => {
-          this.documentos = response.data
 
           if(Object.keys(response.data).length === 0){
             this.sinResultados = true
@@ -316,6 +321,14 @@ export default {
           
           else{
             this.sinResultados = false
+
+            if (updatePage){
+                this.documentos = this.documentos.concat(response.data)
+              }
+              else{
+                this.documentos = response.data
+              }
+
             let nextPage = Object.assign({}, this.queryObject);
             nextPage.page = nextPage.page + 1
             
@@ -338,24 +351,11 @@ export default {
           console.log(e)
         })
     },
-    async updatePage () {
-      this.queryObject.page = this.queryObject.page + 1
-      await axios.post('http://localhost:5000/api/get',
-        this.queryObject
-      )
-        .then(response => {
-          this.documentos = this.documentos.concat(response.data)
-          console.log(response.data)
-        })
-        .catch(e => {
-          console.log(e)
-        })
-    },
     restablecerFiltros () {
       this.filtrar.region = []
       this.filtrar.sector = []
       this.range = [1900,2021]
-      this.getAll()
+      this.getAll(false)
     }
   },
   computed: {
@@ -363,7 +363,7 @@ export default {
   },
   mounted () {
     this.getFiltros()
-    this.getAll()
+    this.getAll(false)
   }
 }
 
