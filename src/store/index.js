@@ -10,7 +10,7 @@ export default new Vuex.Store({
       pagina: [],
       termino: [],
       verMas : false,
-      sinResultados : true,
+      sinResultados : false,
     }
   },
   mutations: {

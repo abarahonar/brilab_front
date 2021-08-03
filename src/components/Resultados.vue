@@ -423,6 +423,7 @@ export default {
         name: 'Retrieve',
         query:{text: this.terminoConsulta}
       })
+      this.restablecerFiltros ()
       this.hayFiltro = false
       this.resultadosFiltrados = []
       const payload = {add: false, pagina: 1, termino: this.terminoConsulta }
